@@ -3,6 +3,8 @@ library(glmnet)
 library(caret)
 library(dplyr)
 library(MASS)
+library(corrplot)
+
 # Cargar librerías para tests
 library(lmtest)
 library(nortest)
@@ -22,11 +24,14 @@ filas_train <- createDataPartition(eph$ingreso_hogar, p = 0.7, list = FALSE)
 entrenar <- eph[filas_train, ]
 probar <- eph[-filas_train, ]
 
+corrplot(cor(entrenar))
+
 # 2: Ajustar tres modelos diferentes de Regresión Lineal Múltiple con el método de los Mínimos Cuadrados
 # Y ) ingreso_ocup
 
 # Modelo 1
 # Con Akaike (AIC) busco equilibrio entre bondad de ajuste y complejidad.
+# Modelo de Selección Automática por Criterio de Información de Akaike (AIC)
 
 mod_aic <- stepAIC(
   object = lm(ingreso_ocup ~ 1, data = entrenar),
@@ -55,6 +60,10 @@ summary(mod_aic)
 
 # Modelo 2
 # Penalización mayor por cada variable incluida, modelo más parsimonioso.
+# Modelo de Selección Automática por Criterio de Información Bayesiano (BIC)
+# Este modelo se seleccionó bajo el principio de parsimonia.
+# BAIC tiene un poco menos de R2 ajustado y un poco más de error.
+# Lo bueno es que no incluye antiguedad laboral (parsimonia).
 
 mod_baic <- stepAIC(
   object = lm(ingreso_ocup ~ 1, data = entrenar),
@@ -65,13 +74,12 @@ mod_baic <- stepAIC(
   steps = 1000 #máximo nro de pasos (1000 es el default)
 )
 
-# BAIC tiene un poco menos de R2 ajustado y un poco más de error.
-# Lo bueno es que no incluye antiguedad laboral (parsimonia).
-
 # El mejor modelo es:
 summary(mod_baic)
 
 # Modelo 3
+# En teoría la instrucción y la experiencia son los motores principales de la productividad 
+# y, por ende, del salario. Es por esto que elegí las variables.
 
 mod_propio <- lm(ingreso_ocup ~ educ_cat + horas_trabajo + formal, data = entrenar)
 summary(mod_propio)
