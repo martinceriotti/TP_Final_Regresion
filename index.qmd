@@ -1,0 +1,32 @@
+---
+title: "TP final de Regresión Avanzada."
+author: "Martín Ceriotti"
+format:
+  pdf:
+    output-file: "informe.pdf"
+    output-dir: "../doc"
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+file.copy("informe.pdf", "../doc/informe.pdf", overwrite = TRUE)
+file.remove("informe.pdf")
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
