@@ -4,6 +4,9 @@ library(caret)
 library(dplyr)
 library(MASS)
 library(corrplot)
+library(dplyr)  
+library(purrr)
+library(kableExtra) 
 
 # Cargar librerías para tests
 library(lmtest)
@@ -23,8 +26,6 @@ set.seed(989269)
 filas_train <- createDataPartition(eph$ingreso_hogar, p = 0.7, list = FALSE)
 entrenar <- eph[filas_train, ]
 probar <- eph[-filas_train, ]
-
-corrplot(cor(entrenar))
 
 # 2: Ajustar tres modelos diferentes de Regresión Lineal Múltiple con el método de los Mínimos Cuadrados
 # Y ) ingreso_ocup
@@ -84,8 +85,46 @@ summary(mod_baic)
 mod_propio <- lm(ingreso_ocup ~ educ_cat + horas_trabajo + formal, data = entrenar)
 summary(mod_propio)
 
+# Métricas de bondad de ajuste y selección de modelos.
 
+criterios <- function(m, maxi) {
+  
+  SCE <- deviance(m)
+  n <- length(residuals(m))
+  p <- length(coefficients(m)) #incluye intercepto
+  
+  #CME
+  cme <- SCE/(n-p)
+  
+  #R2 ajustado
+  r2aj <- summary(m)$adj.r.squared
+  
+  #AKAIKE
+  akaike <- AIC(m)
+  
+  #BIC
+  schwarz <- BIC(m)
+  
+  tibble(CME = cme, R2Aj = r2aj, AIC = akaike, BIC = schwarz)
+}
 
+map_dfr(list(mod_aic, mod_baic, mod_propio), criterios, maxi = mod_aic) %>% 
+  mutate_all(round, 4) %>% 
+  mutate(
+    Modelo = c("Mod AIC", "Mod BAIC", "Modelo Propio"),
+    Explicativas = c(
+      "sexo + edad + est_civil +region+ horas_trabajo +educ_cat + formal + ant_laboral",
+      "sexo + edad + est_civil +region+ horas_trabajo +educ_cat + formal + ant_laboral",
+      "educ_cat + horas_trabajo + formal"
+    )
+  ) %>% 
+  dplyr::select(Modelo, Explicativas, CME, "\\(R_{aj}^2\\)" = R2Aj, AIC, BIC) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(full_width = F) %>% 
+  row_spec(0, background = "black", color = "white", bold = T) %>% 
+  row_spec(1, background = "#A9F5A9") %>% 
+  row_spec(2, background = "#A9D0F5") %>% 
+  row_spec(3, background = "#F5A9A9")
 
 
 
