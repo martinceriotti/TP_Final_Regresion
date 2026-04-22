@@ -1,6 +1,11 @@
 ---
 title: "TP final de Regresión Avanzada"
-author: "Martín Ceriotti"
+author: 
+  - name: "Martín Ceriotti"
+    affiliations:
+      - name: "Universidad Austral."
+        department: "Sede Rosario." # Opcional
+date: last-modified
 lang: es
 format:
   html:
@@ -37,11 +42,20 @@ library(readxl)
 eph <- read_excel("data/eph.xlsx")
 eph <- na.omit(eph)
 
-set.seed(989269)
+```
 
+## Consigna I: Regresión Lineal
+
+```{r}
+#| echo: false
+# 1. Dividir aleatoriamente al conjunto de datos en bloques de entrenamiento (70%) y prueba (30%), definiendo una semilla para hacer que el resultado sea reproducible. Salvo que se exprese lo contrario, todas las consignas presentadas a continuación deben responderse empleando el conjunto de datos de entrenamiento.
+
+set.seed(989269)
 filas_train <- createDataPartition(eph$ingreso_hogar, p = 0.7, list = FALSE)
 entrenar <- eph[filas_train, ]
 probar <- eph[-filas_train, ]
+
+# 2. Ajustar tres modelos diferentes de Regresión Lineal Múltiple con el método de los Mínimos Cuadrados Ordinarios (MCO), definiendo como variable respuesta al ingreso mensual recibido por la ocupación principal. Se debe justificar por qué se eligieron a esos tres modelos en particular (ejemplo: procesos automáticos, técnica del mejor subconjunto, criterios propios, etc.).
 
 # Modelo 1: AIC
 mod_aic <- stepAIC(
@@ -62,11 +76,163 @@ mod_propio <- lm(ingreso_ocup ~ educ_cat + horas_trabajo + formal, data = entren
 
 ```
 
-## Quarto
+### Modelo 1:
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+Modelo de Selección Automática por Criterio de Información de Akaike (AIC). Se busca equilibrio entre bondad de ajuste y complejidad.
 
-## Running Code
+#### Summary del Modelo 1:
+
+```{r}
+#| echo: false
+library(broom)
+
+mod_aic %>% 
+  tidy() %>% 
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  kable(caption = "Coeficientes del Modelo AIC",
+        col.names = c("Término", "Estimación", "Error Est.", "Estadístico t", "p-valor")) %>%
+  kable_styling(full_width = F) %>%
+  row_spec(0, background = "black", color = "white")
+
+```
+
+### Modelo 2: 
+
+Modelo de Selección Automática por Criterio de Información Bayesiano (BIC). Este modelo se seleccionó bajo el principio de parsimonia.
+
+#### Summary del Modelo 2:
+
+```{r}
+#| echo: false
+library(broom)
+
+mod_baic %>% 
+  tidy() %>% 
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  kable(caption = "Coeficientes del Modelo BIC",
+        col.names = c("Término", "Estimación", "Error Est.", "Estadístico t", "p-valor")) %>%
+  kable_styling(full_width = F) %>%
+  row_spec(0, background = "black", color = "white")
+```
+
+### Modelo 3: 
+
+En teoría la instrucción y la experiencia son los motores principales de la productividad, por ende, del salario. Es por esto que elegí las variables educ_cat, horas_trabajo y formal como explicativas del ingreso_ocup.
+
+#### Summary del Modelo 3:
+
+```{r}
+#| echo: false
+library(broom)
+
+mod_propio %>% 
+  tidy() %>% 
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  kable(caption = "Coeficientes del Modelo Propio",
+        col.names = c("Término", "Estimación", "Error Est.", "Estadístico t", "p-valor")) %>%
+  kable_styling(full_width = F) %>%
+  row_spec(0, background = "black", color = "white")
+```
+
+### Comparación de los Modelos
+
+```{r}
+# 3. Comparar los 3 modelos a través de las siguientes métricas de performance: CME, PRESS, AIC y BIC. En base a los resultados observados, elegir un modelo “ganador”.
+
+criterios <- function(m, maxi) {
+  
+  SCE <- deviance(m)
+  n <- length(residuals(m))
+  p <- length(coefficients(m)) #incluye intercepto
+  
+  #CME
+  cme <- SCE/(n-p)
+  
+  #R2 ajustado
+  r2aj <- summary(m)$adj.r.squared
+  
+  #AKAIKE
+  akaike <- AIC(m)
+  
+  #BIC
+  schwarz <- BIC(m)
+  
+  tibble(CME = cme, R2Aj = r2aj, AIC = akaike, BIC = schwarz)
+}
+
+map_dfr(list(mod_aic, mod_baic, mod_propio), criterios, maxi = mod_aic) %>% 
+  mutate_all(round, 4) %>% 
+  mutate(
+    Modelo = c("Mod AIC", "Mod BAIC", "Modelo Propio"),
+    Explicativas = c(
+      "sexo + edad + est_civil +region+ horas_trabajo +educ_cat + formal + ant_laboral",
+      "sexo + edad + est_civil +region+ horas_trabajo +educ_cat + formal + ant_laboral",
+      "educ_cat + horas_trabajo + formal"
+    )
+  ) %>% 
+  dplyr::select(Modelo, Explicativas, CME, "$R_{aj}^2$" = R2Aj, AIC, BIC) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(full_width = F) %>% 
+  row_spec(0, background = "black", color = "white", bold = T) %>% 
+  row_spec(1, background = "#A9F5A9") %>% 
+  row_spec(2, background = "#A9D0F5") %>% 
+  row_spec(3, background = "#F5A9A9")
+```
+
+El modelo mod_aic destaca en 3 de los 4 indicadores. Podemos concluir que es el modelo ganador.
+
+### Análisis de Residuos
+
+```{r}
+# --- A. Linealidad y Homocedasticidad ---
+plot(mod_aic, 1) # Gráfico: Valores Ajustados vs Residuos
+bptest(mod_aic)  # Test de Breusch-Pagan (H0: Homocedasticidad)
+
+```
+
+Gráfico Residuals vs Fitted: La varianza de los residuos aumenta claramente con los valores ajustados (forma de abanico) → indica heterocedasticidad.
+
+Breusch-Pagan: BP = 146.22, p-value \< 2.2e-16 → Se rechaza H0 → Se confirma heterocedasticidad. El supuesto no se cumple.
+
+```{r}
+
+# --- B. Normalidad ---
+plot(mod_aic, 2) # Gráfico: QQ-Plot
+ad.test(residuals(mod_aic)) # Test de Anderson-Darling (H0: Normalidad)
+#QQ-Plot: Los residuos se desvían fuertemente de la línea teórica, especialmente en la cola derecha → no hay normalidad.
+#Anderson-Darling: A = 316.49, p-value < 2.2e-16 → Se rechaza H0 → Se confirma no normalidad. El supuesto no se cumple.
+
+
+```
+
+```{r}
+# --- C. Independencia de los Errores ---
+dwtest(mod_aic) # Test de Durbin-Watson (H0: Autocorrelación nula)
+#Durbin-Watson: DW = 1.8716, p-value = 1.127e-07 → Se rechaza H0 → Existe autocorrelación positiva leve. El supuesto no se cumple estrictamente, aunque el DW está cerca de 2.
+
+```
+
+```{r}
+
+# --- D. Multicolinealidad ---
+vif(mod_aic) # Factor de Inflación de la Varianza (Idealmente < 5)
+# En general, valores de VIF mayores a 5 se consideran problemáticos. En este caso no tenemos ninguno. 
+# No hay multicolinealidad problemática. El supuesto se cumple.
+
+# --- E. Observaciones Influyentes y Atípicas ---
+
+sort(cooks.distance(mod_aic), decreasing = TRUE)[1:10]
+#los 10 mas influyentes.
+
+```
+
+```{r}
+
+plot(mod_aic, 5)        # Leverage vs Residuos estandarizados (incluye Cook)
+influencePlot(mod_aic)  # Tabla con casos influyentes (library(car))
+```
+
+Running Code
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
