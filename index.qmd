@@ -1,12 +1,66 @@
 ---
-title: "TP final de Regresión Avanzada."
+title: "TP final de Regresión Avanzada"
 author: "Martín Ceriotti"
+lang: es
 format:
+  html:
+    toc: true
+    format-links: false  
+    other-links:
+      - text: "Descargar Informe PDF"
+        href: ./doc/index.pdf
   pdf:
-    output-file: "informe.pdf"
-    output-dir: "../doc"
-editor: visual
+    pdf-engine: xelatex
+    variables:
+      contentsname: "Índice"
+post-render: 
+  - Rscript -e "file.copy('index.pdf', 'doc/index.pdf', overwrite = TRUE); file.remove('index.pdf')"
 ---
+
+```{r setup, include=FALSE}
+#| message: false
+#| warning: false
+library(ISLR)
+library(glmnet)
+library(caret)
+library(dplyr)
+library(MASS)
+library(corrplot)
+library(purrr)
+library(kableExtra)
+library(lmtest)
+library(nortest)
+library(car)
+library(readxl)
+
+# Carga de datos
+eph <- read_excel("data/eph.xlsx")
+eph <- na.omit(eph)
+
+set.seed(989269)
+
+filas_train <- createDataPartition(eph$ingreso_hogar, p = 0.7, list = FALSE)
+entrenar <- eph[filas_train, ]
+probar <- eph[-filas_train, ]
+
+# Modelo 1: AIC
+mod_aic <- stepAIC(
+  object = lm(ingreso_ocup ~ 1, data = entrenar),
+  scope = list(upper = lm(ingreso_ocup ~ sexo + edad + est_civil + region + horas_trabajo + educ_cat + formal + ant_laboral, data = entrenar)),
+  direction = "forward", trace = FALSE
+)
+
+# Modelo 2: BIC
+mod_baic <- stepAIC(
+  object = lm(ingreso_ocup ~ 1, data = entrenar),
+  scope = list(upper = lm(ingreso_ocup ~ sexo + edad + est_civil + region + horas_trabajo + educ_cat + formal + ant_laboral, data = entrenar)),
+  direction = "forward", trace = FALSE, k = log(nrow(entrenar))
+)
+
+# Modelo 3: Propio
+mod_propio <- lm(ingreso_ocup ~ educ_cat + horas_trabajo + formal, data = entrenar)
+
+```
 
 ## Quarto
 
@@ -17,16 +71,45 @@ Quarto enables you to weave together content and executable code into a finished
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
-1 + 1
+#| echo: true
+#| message: false
+#| warning: false
+#| paged-print: false
+criterios <- function(m) {
+  SCE <- deviance(m)
+  n <- length(residuals(m))
+  p <- length(coefficients(m))
+  cme <- SCE/(n-p)
+  r2aj <- summary(m)$adj.r.squared
+  tibble(CME = cme, R2Aj = r2aj, AIC = AIC(m), BIC = BIC(m))
+}
+
+map_dfr(list(mod_aic, mod_baic, mod_propio), criterios) %>% 
+  mutate_all(round, 2) %>% 
+  mutate(Modelo = c("Mod AIC", "Mod BAIC", "Modelo Propio")) %>% 
+  dplyr::select(Modelo, CME, "$R_{aj}^2$" = R2Aj, AIC, BIC) %>% 
+  kable(escape = FALSE, caption = "Comparación de métricas de ajuste") %>% 
+  kable_styling(full_width = F, latex_options = "hold_position") %>% 
+  row_spec(1, background = "#A9F5A9")
+```
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| fig-height: 4
+#| layout-ncol: 2
+plot(mod_aic, 1)
+plot(mod_aic, 2)
 ```
 
 You can add options to executable code like this
 
 ```{r}
 #| echo: false
-file.copy("informe.pdf", "../doc/informe.pdf", overwrite = TRUE)
-file.remove("informe.pdf")
+#  quarto render index.qmd && mv index.pdf ./doc/index.pdf
+
+
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
-
