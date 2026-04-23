@@ -96,7 +96,7 @@ mod_aic %>%
 
 ```
 
-### Modelo 2: 
+### Modelo 2:
 
 Modelo de Selección Automática por Criterio de Información Bayesiano (BIC). Este modelo se seleccionó bajo el principio de parsimonia.
 
@@ -115,7 +115,7 @@ mod_baic %>%
   row_spec(0, background = "black", color = "white")
 ```
 
-### Modelo 3: 
+### Modelo 3:
 
 En teoría la instrucción y la experiencia son los motores principales de la productividad, por ende, del salario. Es por esto que elegí las variables educ_cat, horas_trabajo y formal como explicativas del ingreso_ocup.
 
@@ -123,6 +123,8 @@ En teoría la instrucción y la experiencia son los motores principales de la pr
 
 ```{r}
 #| echo: false
+#| message: false
+#| warning: false
 library(broom)
 
 mod_propio %>% 
@@ -137,6 +139,7 @@ mod_propio %>%
 ### Comparación de los Modelos
 
 ```{r}
+#| echo: false
 # 3. Comparar los 3 modelos a través de las siguientes métricas de performance: CME, PRESS, AIC y BIC. En base a los resultados observados, elegir un modelo “ganador”.
 
 criterios <- function(m, maxi) {
@@ -181,55 +184,138 @@ map_dfr(list(mod_aic, mod_baic, mod_propio), criterios, maxi = mod_aic) %>%
 
 El modelo mod_aic destaca en 3 de los 4 indicadores. Podemos concluir que es el modelo ganador.
 
-### Análisis de Residuos
+### Análisis de Residuos.
+
+#### Cumplimiento de supuestos.
+
+##### Homocedasticidad
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 # --- A. Linealidad y Homocedasticidad ---
-plot(mod_aic, 1) # Gráfico: Valores Ajustados vs Residuos
-bptest(mod_aic)  # Test de Breusch-Pagan (H0: Homocedasticidad)
+test_bp <- bptest(mod_aic)
+plot(mod_aic, 1)
+etiqueta <- paste0("Breusch-Pagan Test: BP = ", round(test_bp$statistic, 2), 
+                   ", p-value = ", format.pval(test_bp$p.value, digits = 3))
+mtext(etiqueta, side = 3, line = 1.5, cex = 0.8, col = "darkred")
 
 ```
 
-Gráfico Residuals vs Fitted: La varianza de los residuos aumenta claramente con los valores ajustados (forma de abanico) → indica heterocedasticidad.
+En el gráfico de residuos vs ajustados, vemos que la varianza de los residuos aumenta con los valores ajustados (forma de abanico). El test de Breusch-Pagan nos da un valor de 146.22 con p-value \< 2.2e-16. Se rechaza H0.
 
-Breusch-Pagan: BP = 146.22, p-value \< 2.2e-16 → Se rechaza H0 → Se confirma heterocedasticidad. El supuesto no se cumple.
+El modelo presenta **heterocedasticidad**, lo que significa que el error de nuestras predicciones no es constante. El test estadístico confirma que la variabilidad de los ingresos no se explica de igual manera para todos los niveles socioeconómicos; el modelo es más preciso para algunos grupos que para otros.
+
+##### Normalidad
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 
 # --- B. Normalidad ---
-plot(mod_aic, 2) # Gráfico: QQ-Plot
-ad.test(residuals(mod_aic)) # Test de Anderson-Darling (H0: Normalidad)
+
+test_ad <- ad.test(residuals(mod_aic))
+plot(mod_aic, 2)
+etiqueta_ad <- paste0("Anderson-Darling: A = ", round(test_ad$statistic, 2), 
+                      ", p-value = ", format.pval(test_ad$p.value, digits = 3))
+mtext(etiqueta_ad, side = 3, line = 1.5, cex = 0.9, col = "darkblue", font = 2)
 #QQ-Plot: Los residuos se desvían fuertemente de la línea teórica, especialmente en la cola derecha → no hay normalidad.
 #Anderson-Darling: A = 316.49, p-value < 2.2e-16 → Se rechaza H0 → Se confirma no normalidad. El supuesto no se cumple.
 
 
 ```
 
+Los residuos se desvían fuertemente de la línea teórica, especialmente en la cola derecha con lo cual vemos que no hay normalidad.
+
+El test de Anderson-Darling confirma la ausencia de normalidad.
+
+##### Independencia de los Errores
+
 ```{r}
-# --- C. Independencia de los Errores ---
 dwtest(mod_aic) # Test de Durbin-Watson (H0: Autocorrelación nula)
-#Durbin-Watson: DW = 1.8716, p-value = 1.127e-07 → Se rechaza H0 → Existe autocorrelación positiva leve. El supuesto no se cumple estrictamente, aunque el DW está cerca de 2.
+
 
 ```
 
+Durbin-Watson indica que existe autocorrelación positiva leve. El supuesto no se cumple estrictamente, aunque el DW está cerca de 2.
+
+##### Multicolinealidad
+
 ```{r}
 
-# --- D. Multicolinealidad ---
-vif(mod_aic) # Factor de Inflación de la Varianza (Idealmente < 5)
-# En general, valores de VIF mayores a 5 se consideran problemáticos. En este caso no tenemos ninguno. 
-# No hay multicolinealidad problemática. El supuesto se cumple.
+#| label: tbl-vif
+#| tbl-cap: "Análisis de Multicolinealidad (VIF)"
+#| echo: false
+#| message: false
+#| warning: false
+
+# 1. Calculamos VIF
+vif_values <- car::vif(mod_aic)
+
+# 2. Lo convertimos a una tabla limpia
+# Nota: Usamos GVIF^(1/(2*Df)) si hay variables categóricas, que equivale al VIF tradicional
+if(is.matrix(vif_values)) {
+  vif_df <- as.data.frame(vif_values) %>% 
+    mutate(Variable = rownames(.)) %>%
+    rename(VIF = 3) # La tercera columna es el VIF ajustado
+} else {
+  vif_df <- data.frame(Variable = names(vif_values), VIF = vif_values)
+}
+
+# 3. Formateo de tabla idéntico a tus otras tablas
+vif_df %>%
+  dplyr::select(Variable, VIF) %>%
+  mutate(VIF = round(VIF, 3)) %>%
+  kable(caption = "Factores de Inflación de la Varianza (VIF)",
+        col.names = c("Variable Predictora", "Valor VIF")) %>%
+  kable_styling(full_width = F  ) %>%
+  row_spec(0, background = "black", color = "white", bold = T)
+
+
+ 
+```
+
+En general, valores de VIF mayores a 5 se consideran problemáticos. En este caso no tenemos ninguno.
+
+No hay multicolinealidad problemática.
+
+##### Observaciones Influyentes y Atípicas
+
+```{r}
+ 
 
 # --- E. Observaciones Influyentes y Atípicas ---
 
-sort(cooks.distance(mod_aic), decreasing = TRUE)[1:10]
-#los 10 mas influyentes.
+dist_cook <- cooks.distance(mod_aic)
+
+top_10_cook <- data.frame(
+  Observacion = names(sort(dist_cook, decreasing = TRUE)[1:10]),
+  Distancia_Cook = as.numeric(sort(dist_cook, decreasing = TRUE)[1:10])
+)
+
+top_10_cook %>%
+  mutate(Distancia_Cook = round(Distancia_Cook, 5)) %>%
+  kable(caption = "Análisis de puntos influyentes mediante Distancia de Cook",
+        col.names = c("Nro. de Observación (Fila)", "Distancia de Cook")) %>%
+  kable_styling(full_width = F, latex_options = "hold_position") %>%
+  row_spec(0, background = "black", color = "white", bold = T)
 
 ```
+
+La **Distancia de Cook** mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la Tabla, aunque se identifican las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación
+
+```{r}
+ top_10_cook$Observacion[1]
+```
+
+La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la tabla,para las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación **`r top_10_cook$Observacion[1]`**) es de **`r round(top_10_cook$Distancia_Cook[1], 5)`**. Dado que todos los valores están muy por debajo del umbral crítico de 0.5, podemos concluir que no existen puntos influyentes que estén sesgando los resultados de manera individual. El modelo es estable ante la presencia de estos casos atípicos.
 
 ```{r}
 
 plot(mod_aic, 5)        # Leverage vs Residuos estandarizados (incluye Cook)
-influencePlot(mod_aic)  # Tabla con casos influyentes (library(car))
+
 ```
 
 Running Code
