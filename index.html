@@ -126,7 +126,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Fecha de publicación</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">22 de abril de 2026</p>
+      <p class="date">23 de abril de 2026</p>
     </div>
   </div>
   
@@ -147,15 +147,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="summary-del-modelo-1">Summary del Modelo 1:</h4>
 <div class="cell">
 <div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <caption>Coeficientes del Modelo AIC</caption>
+<colgroup>
+<col style="width: 41%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 18%">
+<col style="width: 10%">
+</colgroup>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; color: white !important; background-color: black !important;">Término</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Estimación</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Error Est.</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Estadístico t</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">p-valor</th>
+<th style="text-align: left;">Término</th>
+<th style="text-align: right;">Estimación</th>
+<th style="text-align: right;">Error Est.</th>
+<th style="text-align: right;">Estadístico t</th>
+<th style="text-align: right;">p-valor</th>
 </tr>
 </thead>
 <tbody>
@@ -317,6 +324,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Extraemos las métricas de ajuste con broom::glance()</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>metrics <span class="ot">&lt;-</span> <span class="fu">glance</span>(mod_aic) <span class="sc">%&gt;%</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">R-squared</span><span class="st">`</span> <span class="ot">=</span> r.squared,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Adj. R-squared</span><span class="st">`</span> <span class="ot">=</span> adj.r.squared,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Sigma (Res. Error)</span><span class="st">`</span> <span class="ot">=</span> sigma,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">F-statistic</span><span class="st">`</span> <span class="ot">=</span> statistic,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> p.value,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">DF</span><span class="st">`</span> <span class="ot">=</span> df.residual</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>metrics <span class="sc">%&gt;%</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Estadísticos de Ajuste del Modelo"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">latex_options =</span> <span class="st">"hold_position"</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small">
+<caption>Estadísticos de Ajuste del Modelo</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">R-squared</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Adj. R-squared</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Sigma (Res. Error)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">F-statistic</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p-value</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">DF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0.327</td>
+<td style="text-align: right;">582.379</td>
+<td style="text-align: right;">149.845</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">6402</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 <section id="modelo-2" class="level3">
@@ -326,15 +377,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="summary-del-modelo-2">Summary del Modelo 2:</h4>
 <div class="cell">
 <div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <caption>Coeficientes del Modelo BIC</caption>
+<colgroup>
+<col style="width: 41%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 18%">
+<col style="width: 10%">
+</colgroup>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; color: white !important; background-color: black !important;">Término</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Estimación</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Error Est.</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Estadístico t</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">p-valor</th>
+<th style="text-align: left;">Término</th>
+<th style="text-align: right;">Estimación</th>
+<th style="text-align: right;">Error Est.</th>
+<th style="text-align: right;">Estadístico t</th>
+<th style="text-align: right;">p-valor</th>
 </tr>
 </thead>
 <tbody>
@@ -470,15 +528,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="summary-del-modelo-3">Summary del Modelo 3:</h4>
 <div class="cell">
 <div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <caption>Coeficientes del Modelo Propio</caption>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; color: white !important; background-color: black !important;">Término</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Estimación</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Error Est.</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">Estadístico t</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; color: white !important; background-color: black !important;">p-valor</th>
+<th style="text-align: left;">Término</th>
+<th style="text-align: right;">Estimación</th>
+<th style="text-align: right;">Error Est.</th>
+<th style="text-align: right;">Estadístico t</th>
+<th style="text-align: right;">p-valor</th>
 </tr>
 </thead>
 <tbody>
@@ -534,41 +592,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="comparación-de-los-modelos">Comparación de los Modelos</h3>
 <div class="cell">
 <div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
+<caption>Comparación de Criterios de Selección de Modelos</caption>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: black !important;">Modelo</th>
-<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: black !important;">Explicativas</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; color: white !important; background-color: black !important;">CME</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; color: white !important; background-color: black !important;">$R_{aj}^2$</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; color: white !important; background-color: black !important;">AIC</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; color: white !important; background-color: black !important;">BIC</th>
+<th style="text-align: left;">Modelo</th>
+<th style="text-align: right;">CME</th>
+<th style="text-align: right;">R2Aj</th>
+<th style="text-align: right;">AIC</th>
+<th style="text-align: right;">BIC</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left; background-color: rgba(169, 245, 169, 255) !important;">Mod AIC</td>
-<td style="text-align: left; background-color: rgba(169, 245, 169, 255) !important;">sexo + edad + est_civil +region+ horas_trabajo +educ_cat + formal + ant_laboral</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">339165.3</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">0.3273</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">100059.3</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">100214.9</td>
+<td style="text-align: left;">Mod AIC</td>
+<td style="text-align: right;">339165.3</td>
+<td style="text-align: right;">0.3273</td>
+<td style="text-align: right;">100059.3</td>
+<td style="text-align: right;">100214.9</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; background-color: rgba(169, 208, 245, 255) !important;">Mod BAIC</td>
-<td style="text-align: left; background-color: rgba(169, 208, 245, 255) !important;">sexo + edad + est_civil +region+ horas_trabajo +educ_cat + formal + ant_laboral</td>
-<td style="text-align: right; background-color: rgba(169, 208, 245, 255) !important;">340028.6</td>
-<td style="text-align: right; background-color: rgba(169, 208, 245, 255) !important;">0.3256</td>
-<td style="text-align: right; background-color: rgba(169, 208, 245, 255) !important;">100070.6</td>
-<td style="text-align: right; background-color: rgba(169, 208, 245, 255) !important;">100192.4</td>
+<td style="text-align: left;">Mod BAIC</td>
+<td style="text-align: right;">340028.6</td>
+<td style="text-align: right;">0.3256</td>
+<td style="text-align: right;">100070.6</td>
+<td style="text-align: right;">100192.4</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left; background-color: rgba(245, 169, 169, 255) !important;">Modelo Propio</td>
-<td style="text-align: left; background-color: rgba(245, 169, 169, 255) !important;">educ_cat + horas_trabajo + formal</td>
-<td style="text-align: right; background-color: rgba(245, 169, 169, 255) !important;">379610.7</td>
-<td style="text-align: right; background-color: rgba(245, 169, 169, 255) !important;">0.2471</td>
-<td style="text-align: right; background-color: rgba(245, 169, 169, 255) !important;">100767.0</td>
-<td style="text-align: right; background-color: rgba(245, 169, 169, 255) !important;">100814.4</td>
+<td style="text-align: left;">Modelo Propio</td>
+<td style="text-align: right;">379610.7</td>
+<td style="text-align: right;">0.2471</td>
+<td style="text-align: right;">100767.0</td>
+<td style="text-align: right;">100814.4</td>
 </tr>
 </tbody>
 </table>
@@ -586,7 +641,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/G-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -600,7 +655,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/E-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -611,7 +666,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="independencia-de-los-errores" class="level5">
 <h5 class="anchored" data-anchor-id="independencia-de-los-errores">Independencia de los Errores</h5>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dwtest</span>(mod_aic) <span class="co"># Test de Durbin-Watson (H0: Autocorrelación nula)</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Durbin-Watson test
@@ -626,41 +680,14 @@ alternative hypothesis: true autocorrelation is greater than 0</code></pre>
 <section id="multicolinealidad" class="level5">
 <h5 class="anchored" data-anchor-id="multicolinealidad">Multicolinealidad</h5>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-vif</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Análisis de Multicolinealidad (VIF)"</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Calculamos VIF</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>vif_values <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">vif</span>(mod_aic)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Lo convertimos a una tabla limpia</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nota: Usamos GVIF^(1/(2*Df)) si hay variables categóricas, que equivale al VIF tradicional</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">is.matrix</span>(vif_values)) {</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  vif_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(vif_values) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="fu">rownames</span>(.)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">VIF =</span> <span class="dv">3</span>) <span class="co"># La tercera columna es el VIF ajustado</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  vif_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Variable =</span> <span class="fu">names</span>(vif_values), <span class="at">VIF =</span> vif_values)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Formateo de tabla idéntico a tus otras tablas</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>vif_df <span class="sc">%&gt;%</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Variable, VIF) <span class="sc">%&gt;%</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">VIF =</span> <span class="fu">round</span>(VIF, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Factores de Inflación de la Varianza (VIF)"</span>,</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Variable Predictora"</span>, <span class="st">"Valor VIF"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F  ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">0</span>, <span class="at">background =</span> <span class="st">"black"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">bold =</span> T)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <caption>Factores de Inflación de la Varianza (VIF)</caption>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: black !important;"></th>
-<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: black !important;">Variable Predictora</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; color: white !important; background-color: black !important;">Valor VIF</th>
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Variable Predictora</th>
+<th style="text-align: right;">Valor VIF</th>
 </tr>
 </thead>
 <tbody>
@@ -714,28 +741,13 @@ alternative hypothesis: true autocorrelation is greater than 0</code></pre>
 <section id="observaciones-influyentes-y-atípicas" class="level5">
 <h5 class="anchored" data-anchor-id="observaciones-influyentes-y-atípicas">Observaciones Influyentes y Atípicas</h5>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- E. Observaciones Influyentes y Atípicas ---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dist_cook <span class="ot">&lt;-</span> <span class="fu">cooks.distance</span>(mod_aic)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>top_10_cook <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Observacion =</span> <span class="fu">names</span>(<span class="fu">sort</span>(dist_cook, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Distancia_Cook =</span> <span class="fu">as.numeric</span>(<span class="fu">sort</span>(dist_cook, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>top_10_cook <span class="sc">%&gt;%</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Distancia_Cook =</span> <span class="fu">round</span>(Distancia_Cook, <span class="dv">5</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Análisis de puntos influyentes mediante Distancia de Cook"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Nro. de Observación (Fila)"</span>, <span class="st">"Distancia de Cook"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F, <span class="at">latex_options =</span> <span class="st">"hold_position"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">0</span>, <span class="at">background =</span> <span class="st">"black"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">bold =</span> T)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <caption>Análisis de puntos influyentes mediante Distancia de Cook</caption>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: black !important;">Nro. de Observación (Fila)</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; color: white !important; background-color: black !important;">Distancia de Cook</th>
+<th style="text-align: left;">Nro. de Observación (Fila)</th>
+<th style="text-align: right;">Distancia de Cook</th>
 </tr>
 </thead>
 <tbody>
@@ -783,95 +795,48 @@ alternative hypothesis: true autocorrelation is greater than 0</code></pre>
 </table>
 </div>
 </div>
-<p>La <strong>Distancia de Cook</strong> mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la Tabla, aunque se identifican las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a> top_10_cook<span class="sc">$</span>Observacion[<span class="dv">1</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a> top_10_cook<span class="sc">$</span>Observacion[<span class="dv">1</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "3170"</code></pre>
 </div>
 </div>
-<p>La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la <strong>@tbl-cook-distance</strong>, aunque se identifican las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación <strong>3170</strong>) es de <strong>0.05054</strong>. Dado que todos los valores están muy por debajo del umbral crítico…</p>
+<p>La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la tabla,para las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación <strong>3170</strong>) es de <strong>0.05054</strong>. Dado que todos los valores están muy por debajo del umbral crítico de 0.5, podemos concluir que no existen puntos influyentes que estén sesgando los resultados de manera individual. El modelo es estable ante la presencia de estos casos atípicos.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mod_aic, <span class="dv">5</span>)        <span class="co"># Leverage vs Residuos estandarizados (incluye Cook)</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/A-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Running Code</p>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>criterios <span class="ot">&lt;-</span> <span class="cf">function</span>(m) {</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  SCE <span class="ot">&lt;-</span> <span class="fu">deviance</span>(m)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">residuals</span>(m))</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">coefficients</span>(m))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  cme <span class="ot">&lt;-</span> SCE<span class="sc">/</span>(n<span class="sc">-</span>p)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  r2aj <span class="ot">&lt;-</span> <span class="fu">summary</span>(m)<span class="sc">$</span>adj.r.squared</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">CME =</span> cme, <span class="at">R2Aj =</span> r2aj, <span class="at">AIC =</span> <span class="fu">AIC</span>(m), <span class="at">BIC =</span> <span class="fu">BIC</span>(m))</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(<span class="fu">list</span>(mod_aic, mod_baic, mod_propio), criterios) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_all</span>(round, <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Modelo =</span> <span class="fu">c</span>(<span class="st">"Mod AIC"</span>, <span class="st">"Mod BAIC"</span>, <span class="st">"Modelo Propio"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Modelo, CME, <span class="st">"$R_{aj}^2$"</span> <span class="ot">=</span> R2Aj, AIC, BIC) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">escape =</span> <span class="cn">FALSE</span>, <span class="at">caption =</span> <span class="st">"Comparación de métricas de ajuste"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F, <span class="at">latex_options =</span> <span class="st">"hold_position"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">1</span>, <span class="at">background =</span> <span class="st">"#A9F5A9"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<table class="table caption-top table-sm table-striped small">
-<caption>Comparación de métricas de ajuste</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Modelo</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">CME</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">$R_{aj}^2$</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">AIC</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">BIC</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left; background-color: rgba(169, 245, 169, 255) !important;">Mod AIC</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">339165.3</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">0.33</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">100059.3</td>
-<td style="text-align: right; background-color: rgba(169, 245, 169, 255) !important;">100214.9</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Mod BAIC</td>
-<td style="text-align: right;">340028.6</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: right;">100070.6</td>
-<td style="text-align: right;">100192.4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Modelo Propio</td>
-<td style="text-align: right;">379610.7</td>
-<td style="text-align: right;">0.25</td>
-<td style="text-align: right;">100767.0</td>
-<td style="text-align: right;">100814.4</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mod_aic, <span class="dv">1</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mod_aic, <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="index_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-<p>You can add options to executable code like this</p>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+<p>Interpretación de efectos sobre el ingreso ocupacional.</p>
+<p>Formalidad laboral</p>
+<p>Ser trabajador formal aumenta el ingreso en $301 respecto a un trabajador informal, efecto altamente significativo (p &lt; 0.001).</p>
+<p>Horas trabajadas</p>
+<p>Por cada hora adicional trabajada, el ingreso aumenta $10.69, efecto altamente significativo (p &lt; 0.001).</p>
+<p>Nivel educativo</p>
+<p>Categoría de referencia: Sin instrucción.</p>
+<p>NivelEfectoSignificanciaPrimario+$103No significativo (p = 0.074)Secundario+$238Significativo (p &lt; 0.001)Superior+$607Altamente significativo (p &lt; 0.001)</p>
+<p>A mayor educación, mayor ingreso. El nivel primario no es estadísticamente distinto del nivel sin instrucción.</p>
+<p>Región</p>
+<p>Categoría de referencia: Cuyo.</p>
+<p>RegiónEfectoSignificanciaGran Buenos Aires+$139SignificativoNoreste-$138SignificativoNoroeste-$135SignificativoPampeana+$92SignificativoPatagonia+$372Altamente significativo</p>
+<p>Patagonia tiene el mayor ingreso relativo; Noreste y Noroeste los menores.</p>
+<p>Edad</p>
+<p>Por cada año adicional de edad, el ingreso aumenta $4.41, efecto significativo (p &lt; 0.001).</p>
+<p>Sexo</p>
+<p>Categoría de referencia: Varón. Las mujeres tienen en promedio $152 menos de ingreso, efecto altamente significativo (p &lt; 0.001).</p>
+<p>Estado civil</p>
+<p>Categoría de referencia: Casado.</p>
+<p>EstadoEfectoSignificanciaSeparado/divorciado-$120SignificativoSoltero-$138Altamente significativoUnido-$63SignificativoViudo-$184Significativo</p>
+<p>Todos los estados civiles distintos de casado presentan menor ingreso.</p>
+<p>Antigüedad laboral</p>
+<p>Categoría de referencia: Menos de 3 meses.</p>
+<p>Ninguna categoría resulta estadísticamente significativa (todos los p-values &gt; 0.05, salvo “6 meses a 1 año” con p = 0.098 marginal). La antigüedad laboral no tiene efecto significativo sobre el ingreso en este modelo.</p>
+<p>Ajuste global</p>
+<p>El modelo explica el 32.7% de la variabilidad del ingreso (R²aj = 0.327), siendo globalmente significativo (F-statistic p &lt; 0.001).</p>
 </section>
 </section>
 </section>
