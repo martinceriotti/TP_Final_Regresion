@@ -76,6 +76,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="index_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -95,6 +124,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#comparación-de-los-modelos" id="toc-comparación-de-los-modelos" class="nav-link" data-scroll-target="#comparación-de-los-modelos">Comparación de los Modelos</a></li>
   <li><a href="#análisis-de-residuos." id="toc-análisis-de-residuos." class="nav-link" data-scroll-target="#análisis-de-residuos.">Análisis de Residuos.</a></li>
   <li><a href="#interpretación-de-efectos-sobre-el-ingreso-ocupacional." id="toc-interpretación-de-efectos-sobre-el-ingreso-ocupacional." class="nav-link" data-scroll-target="#interpretación-de-efectos-sobre-el-ingreso-ocupacional.">Interpretación de efectos sobre el ingreso ocupacional.</a></li>
+  </ul></li>
+  <li><a href="#consigna-ii-regularización-y-predicción" id="toc-consigna-ii-regularización-y-predicción" class="nav-link" data-scroll-target="#consigna-ii-regularización-y-predicción">Consigna II: Regularización y Predicción</a>
+  <ul class="collapse">
+  <li><a href="#ajustar-el-modelo-mediante-ridge." id="toc-ajustar-el-modelo-mediante-ridge." class="nav-link" data-scroll-target="#ajustar-el-modelo-mediante-ridge.">Ajustar el modelo mediante Ridge.</a></li>
+  <li><a href="#ajustar-el-modelo-mediante-lasso." id="toc-ajustar-el-modelo-mediante-lasso." class="nav-link" data-scroll-target="#ajustar-el-modelo-mediante-lasso.">Ajustar el modelo mediante Lasso.</a></li>
+  <li><a href="#capacidad-predictiva." id="toc-capacidad-predictiva." class="nav-link" data-scroll-target="#capacidad-predictiva.">Capacidad predictiva.</a></li>
   </ul></li>
   </ul>
 <div class="quarto-other-links"><h2>Otros Enlaces</h2><ul><li><a href="./doc/index.pdf"><i class="bi bi-link-45deg"></i>Descargar Informe PDF</a></li></ul></div></nav>
@@ -909,6 +944,35 @@ alternative hypothesis: true autocorrelation is greater than 0</code></pre>
 <h4 class="anchored" data-anchor-id="ajuste-global">Ajuste global</h4>
 <p>El modelo explica el 32.7% de la variabilidad del ingreso (R²aj = 0.327), siendo globalmente significativo (F-statistic p &lt; 0.001).</p>
 </section>
+</section>
+</section>
+<section id="consigna-ii-regularización-y-predicción" class="level2">
+<h2 class="anchored" data-anchor-id="consigna-ii-regularización-y-predicción">Consigna II: Regularización y Predicción</h2>
+<section id="ajustar-el-modelo-mediante-ridge." class="level3">
+<h3 class="anchored" data-anchor-id="ajustar-el-modelo-mediante-ridge.">Ajustar el modelo mediante Ridge.</h3>
+<p>El valor óptimo hallado mediante validación cruzada (<span class="math inline">\(k=5\)</span>) es <span class="math inline">\(\lambda \approx 27.10\)</span>. Al ser un valor mayor a cero, el algoritmo confirma que aplicar una ligera penalización a los coeficientes ayuda a generalizar mejor el modelo. Esto indica que el modelo original de Mínimos Cuadrados Ordinarios (MCO) tenía una varianza ligeramente elevada que Ridge logra mitigar.</p>
+<p>Comparación de Desempeño (MSE). Al evaluar ambos modelos con los datos de prueba (test set), observamos que:</p>
+<ul>
+<li><p>MSE Ridge: <span class="math inline">\(311886.8\)</span></p></li>
+<li><p>MSE MCO (AIC): <span class="math inline">\(312404.5\)</span></p></li>
+</ul>
+<p>La reducción del error cuadrático medio es de aproximadamente un 0.17%.</p>
+</section>
+<section id="ajustar-el-modelo-mediante-lasso." class="level3">
+<h3 class="anchored" data-anchor-id="ajustar-el-modelo-mediante-lasso.">Ajustar el modelo mediante Lasso.</h3>
+<p>El valor óptimo hallado mediante validación cruzada (<span class="math inline">\(k=5\)</span>) es <span class="math inline">\(\lambda \approx 0.2098\)</span>.</p>
+<p>Comparación de Desempeño (MSE). Al evaluar ambos modelos con los datos de prueba (test set), observamos que:</p>
+<ul>
+<li><p>MSE Lasso: <span class="math inline">\(312279.7\)</span></p></li>
+<li><p>MSE MCO (AIC): <span class="math inline">\(312404.5\)</span></p></li>
+</ul>
+</section>
+<section id="capacidad-predictiva." class="level3">
+<h3 class="anchored" data-anchor-id="capacidad-predictiva.">Capacidad predictiva.</h3>
+<p>De acuerdo a los resultados obtenidos, el modelo más adecuado para este ejemplo es la <strong>Regresión Ridge</strong>, el cual tiene el error cuadrático medio más bajo.</p>
+<p><strong>Modelo 1</strong> MCO (Selección AIC) - MSE: 312404.5</p>
+<p><strong>Modelo 2</strong> Regresión Ridge (<span class="math inline">\(\lambda = 27.10\)</span>) - MSE: 311886.8</p>
+<p><strong>Modelo 3</strong> Regresión Lasso (<span class="math inline">\(\lambda = 0.21\)</span>) - MSE: 312279.7</p>
 </section>
 </section>
 

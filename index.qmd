@@ -394,7 +394,7 @@ plot(mod_aic, 5)        # Leverage vs Residuos estandarizados (incluye Cook)
 
 En la interpretación, cuando analizamos una variable, suponemos que mantenemos todas las demás constantes.
 
-##### Formalidad laboral: 
+##### Formalidad laboral:
 
 Ser trabajador formal aumenta el ingreso en \$301 respecto a un trabajador informal. Es significativo (p \< 0.001).
 
@@ -453,3 +453,112 @@ Ninguna categoría resulta estadísticamente significativa (todos los p-values \
 #### Ajuste global
 
 El modelo explica el 32.7% de la variabilidad del ingreso (R²aj = 0.327), siendo globalmente significativo (F-statistic p \< 0.001).
+
+## Consigna II: Regularización y Predicción
+
+### Ajustar el modelo mediante Ridge.
+
+```{r}
+#| label: RIDGE
+#| message: false
+#| warning: false
+#| include: false
+
+
+formula_aic <- ingreso_ocup ~ formal + horas_trabajo + educ_cat + region + edad + sexo + est_civil + ant_laboral
+
+
+#Matrices para glmnet
+Xtrain_aic <- model.matrix(formula_aic, data = entrenar)[, -1]
+Xtest_aic  <- model.matrix(formula_aic, data = probar)[, -1]
+
+#Cross Validation
+cv_ridge <- cv.glmnet(
+  x = Xtrain_aic, 
+  y = entrenar$ingreso_ocup, 
+  nfolds = 5, 
+  alpha = 0
+)
+#Lambda optimo
+lambda_ridge <- cv_ridge$lambda.min
+
+
+#Predicciones
+pred_ridge <- predict(cv_ridge, newx = Xtest_aic, s = lambda_ridge)
+
+pred_iac  <- predict(mod_aic, newdata = probar)
+
+#MSE
+
+mean((probar$ingreso_ocup - pred_ridge)^2)
+
+mean((probar$ingreso_ocup - pred_iac)^2)
+lambda_ridge
+```
+
+El valor óptimo hallado mediante validación cruzada ($k=5$) es $\lambda \approx 27.10$. Al ser un valor mayor a cero, el algoritmo confirma que aplicar una ligera penalización a los coeficientes ayuda a generalizar mejor el modelo. Esto indica que el modelo original de Mínimos Cuadrados Ordinarios (MCO) tenía una varianza ligeramente elevada que Ridge logra mitigar.
+
+Comparación de Desempeño (MSE). Al evaluar ambos modelos con los datos de prueba (test set), observamos que:
+
+-   MSE Ridge: $311886.8$
+
+-   MSE MCO (AIC): $312404.5$
+
+La reducción del error cuadrático medio es de aproximadamente un 0.17%.
+
+### Ajustar el modelo mediante Lasso.
+
+```{r}
+#| label: LASSO
+#| message: false
+#| warning: false
+#| include: false
+ 
+formula_aic <- ingreso_ocup ~ formal + horas_trabajo + educ_cat + region + edad + sexo + est_civil + ant_laboral
+
+
+#Matrices para glmnet
+Xtrain_aic <- model.matrix(formula_aic, data = entrenar)[, -1]
+Xtest_aic  <- model.matrix(formula_aic, data = probar)[, -1]
+
+#Cross Validation
+cv_lasso <- cv.glmnet(
+  x = Xtrain_aic, 
+  y = entrenar$ingreso_ocup, 
+  nfolds = 5, 
+  alpha = 1
+)
+
+#Predicciones
+pred_lasso <- predict(cv_lasso, newx = Xtest_aic, s = "lambda.min" )
+
+pred_iac  <- predict(mod_aic, newdata = probar)
+
+#MSE
+
+mean((probar$ingreso_ocup - pred_lasso)^2)
+
+mean((probar$ingreso_ocup - pred_iac)^2)
+
+cv_lasso$lambda.min
+cv_lasso$lambda.1se
+
+```
+
+El valor óptimo hallado mediante validación cruzada ($k=5$) es $\lambda \approx 0.2098$.
+
+Comparación de Desempeño (MSE). Al evaluar ambos modelos con los datos de prueba (test set), observamos que:
+
+-   MSE Lasso: $312279.7$
+
+-   MSE MCO (AIC): $312404.5$
+
+### Capacidad predictiva.
+
+De acuerdo a los resultados obtenidos, el modelo más adecuado para este ejemplo es la **Regresión Ridge**, el cual tiene el error cuadrático medio más bajo.
+
+**Modelo 1** MCO (Selección AIC) - MSE: 312404.5
+
+**Modelo 2** Regresión Ridge ($\lambda = 27.10$)  - MSE: 311886.8
+
+**Modelo 3** Regresión Lasso ($\lambda = 0.21$)  - MSE: 312279.7
