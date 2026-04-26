@@ -21,6 +21,7 @@ format:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 #| message: false
 #| warning: false
 library(ISLR)
@@ -47,6 +48,8 @@ eph <- na.omit(eph)
 ```{r}
 #| label: FDD
 #| echo: false
+#| message: false
+#| warning: false
 # 1. Dividir aleatoriamente al conjunto de datos en bloques de entrenamiento (70%) y prueba (30%), definiendo una semilla para hacer que el resultado sea reproducible. Salvo que se exprese lo contrario, todas las consignas presentadas a continuación deben responderse empleando el conjunto de datos de entrenamiento.
 
 set.seed(989269)
@@ -84,18 +87,22 @@ Modelo de Selección Automática por Criterio de Información de Akaike (AIC). S
 ```{r}
 #| label: DE
 #| echo: false
+#| message: false
+#| warning: false
 library(broom)
-
 mod_aic %>% 
   tidy() %>% 
-  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(across(where(is.numeric) & !p.value , ~round(., 2)), p.value = format(p.value, scientific = TRUE, digits = 3)) %>%
   kable(caption = "Coeficientes del Modelo AIC",
         col.names = c("Término", "Estimación", "Error Est.", "Estadístico t", "p-valor")) 
 ```
 
 ```{r}
+#| label: METRICAS1
+#| echo: false
+#| message: false
+#| warning: false
 
-# 2. Extraemos las métricas de ajuste con broom::glance()
 metrics <- glance(mod_aic) %>%
   dplyr::select(
     `R-squared` = r.squared,
@@ -123,13 +130,38 @@ Modelo de Selección Automática por Criterio de Información Bayesiano (BIC). E
 ```{r}
 #| label: DG
 #| echo: false
+#| message: false
+#| warning: false
 library(broom)
 
 mod_baic %>% 
   tidy() %>% 
-  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(across(where(is.numeric) & !p.value , ~round(., 2)), p.value = format(p.value, scientific = TRUE, digits = 3)) %>%
   kable(caption = "Coeficientes del Modelo BIC",
         col.names = c("Término", "Estimación", "Error Est.", "Estadístico t", "p-valor"))  
+```
+
+```{r}
+#| label: METRICAS2
+#| echo: false
+#| message: false
+#| warning: false
+metrics <- glance(mod_baic) %>%
+  dplyr::select(
+    `R-squared` = r.squared,
+    `Adj. R-squared` = adj.r.squared,
+    `Sigma (Res. Error)` = sigma,
+    `F-statistic` = statistic,
+    `p-value` = p.value,
+    `DF` = df.residual
+  )
+metrics %>%
+  kable(digits = 3, caption = "Estadísticos de Ajuste del Modelo") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    latex_options = "hold_position",
+   
+  )		
 ```
 
 ### Modelo 3:
@@ -147,9 +179,32 @@ library(broom)
 
 mod_propio %>% 
   tidy() %>% 
-  mutate(across(where(is.numeric), ~round(., 3))) %>%
+    mutate(across(where(is.numeric) & !p.value , ~round(., 2)), p.value = format(p.value, scientific = TRUE, digits = 3)) %>%
   kable(caption = "Coeficientes del Modelo Propio",
         col.names = c("Término", "Estimación", "Error Est.", "Estadístico t", "p-valor"))  
+```
+
+```{r}
+#| label: METRICAS3
+#| echo: false
+#| message: false
+#| warning: false
+metrics <- glance(mod_propio) %>%
+  dplyr::select(
+    `R-squared` = r.squared,
+    `Adj. R-squared` = adj.r.squared,
+    `Sigma (Res. Error)` = sigma,
+    `F-statistic` = statistic,
+    `p-value` = p.value,
+    `DF` = df.residual
+  )
+metrics %>%
+  kable(digits = 3, caption = "Estadísticos de Ajuste del Modelo") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    latex_options = "hold_position",
+   
+  )		
 ```
 
 ### Comparación de los Modelos
@@ -157,6 +212,8 @@ mod_propio %>%
 ```{r}
 #| label: F
 #| echo: false
+#| message: false
+#| warning: false
 # 3. Comparar los 3 modelos a través de las siguientes métricas de performance: CME, PRESS, AIC y BIC. En base a los resultados observados, elegir un modelo “ganador”.
 
 criterios <- function(m, maxi) {
@@ -213,7 +270,7 @@ mtext(etiqueta, side = 3, line = 1.5, cex = 0.8, col = "darkred")
 
 En el gráfico de residuos vs ajustados, vemos que la varianza de los residuos aumenta con los valores ajustados (forma de abanico). El test de Breusch-Pagan nos da un valor de 146.22 con p-value \< 2.2e-16. Se rechaza H0.
 
-El modelo presenta **heterocedasticidad**, lo que significa que el error de nuestras predicciones no es constante. El test estadístico confirma que la variabilidad de los ingresos no se explica de igual manera para todos los niveles socioeconómicos; el modelo es más preciso para algunos grupos que para otros.
+El modelo presenta **heterocedasticidad**, lo que significa que el error de nuestras predicciones no es constante. El test estadístico confirma que la variabilidad de los ingresos no se explica de igual manera para todos los niveles socioeconómicos.
 
 ##### Normalidad
 
@@ -322,7 +379,7 @@ top_10_cook %>%
  top_10_cook$Observacion[1]
 ```
 
-La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la tabla,para las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación **`r top_10_cook$Observacion[1]`**) es de **`r round(top_10_cook$Distancia_Cook[1], 5)`**. Dado que todos los valores están muy por debajo del umbral crítico de 0.5, podemos concluir que no existen puntos influyentes que estén sesgando los resultados de manera individual. El modelo es estable ante la presencia de estos casos atípicos.
+La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se excluye una observación particular. Como se observa en la tabla, para las 10 observaciones con mayor impacto relativo, el valor máximo alcanzado (el de la observación **`r top_10_cook$Observacion[1]`**) es de **`r round(top_10_cook$Distancia_Cook[1], 5)`**. Dado que todos los valores están muy por debajo del umbral crítico de 0.5, podemos concluir que no existen puntos influyentes que estén sesgando los resultados de manera individual. El modelo es estable ante la presencia de estos casos atípicos.
 
 ```{r}
 #| label: A
@@ -333,54 +390,66 @@ La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se 
 plot(mod_aic, 5)        # Leverage vs Residuos estandarizados (incluye Cook)
 ```
 
-Interpretación de efectos sobre el ingreso ocupacional.
+### Interpretación de efectos sobre el ingreso ocupacional.
 
-Formalidad laboral
+En la interpretación, cuando analizamos una variable, suponemos que mantenemos todas las demás constantes.
 
-Ser trabajador formal aumenta el ingreso en \$301 respecto a un trabajador informal, efecto altamente significativo (p \< 0.001).
+##### Formalidad laboral: 
 
-Horas trabajadas
+Ser trabajador formal aumenta el ingreso en \$301 respecto a un trabajador informal. Es significativo (p \< 0.001).
 
-Por cada hora adicional trabajada, el ingreso aumenta \$10.69, efecto altamente significativo (p \< 0.001).
+##### Horas trabajadas:
 
-Nivel educativo
+Por cada hora adicional trabajada, el ingreso aumenta \$10.69. Es significativo (p \< 0.001).
 
-Categoría de referencia: Sin instrucción.
+##### Nivel educativo:
 
-NivelEfectoSignificanciaPrimario+\$103No significativo (p = 0.074)Secundario+\$238Significativo (p \< 0.001)Superior+\$607Altamente significativo (p \< 0.001)
+-   Primario: tener el nivel primera aumenta \$103. No es significativo (p = 0.074).
 
-A mayor educación, mayor ingreso. El nivel primario no es estadísticamente distinto del nivel sin instrucción.
+-   Secundario: tener el nivel secundario aumenta \$238. Es Significativo (p \< 0.001).
 
-Región
+-   Superior: el nivel superior de educación aumenta \$607. Altamente significativo (p \< 0.001).
 
-Categoría de referencia: Cuyo.
+A mayor educación, mayor ingreso.
 
-RegiónEfectoSignificanciaGran Buenos Aires+\$139SignificativoNoreste-\$138SignificativoNoroeste-\$135SignificativoPampeana+\$92SignificativoPatagonia+\$372Altamente significativo
+##### Región:
 
-Patagonia tiene el mayor ingreso relativo; Noreste y Noroeste los menores.
+-   Gran Buenos Aires: pertenecer a esta región aumenta \$139. Es estadísticamente significativo (p \< 0.001).
 
-Edad
+-   Noreste: pertenecer a esta región aumenta \$138. Es estadísticamente significativo (p \< 0.001).
 
-Por cada año adicional de edad, el ingreso aumenta \$4.41, efecto significativo (p \< 0.001).
+-   Noroeste: pertenecer a esta región aumenta \$135. Es estadísticamente significativo (p \< 0.001).
 
-Sexo
+-   Pampeana: pertenecer a esta región aumenta \$92. Es estadísticamente significativo (p \< 0.001).
 
-Categoría de referencia: Varón. Las mujeres tienen en promedio \$152 menos de ingreso, efecto altamente significativo (p \< 0.001).
+-   Patagonia: pertenecer a esta región aumenta \$372. Es estadísticamente **muy** significativo (p \< 0.001).
 
-Estado civil
+Patagonia tiene el mayor ingreso relativo. Noreste y Noroeste los menores.
 
-Categoría de referencia: Casado.
+##### Edad
 
-EstadoEfectoSignificanciaSeparado/divorciado-\$120SignificativoSoltero-\$138Altamente significativoUnido-\$63SignificativoViudo-\$184Significativo
+Por cada año adicional de edad, el ingreso aumenta \$4.41, con efecto significativo (p \< 0.001).
+
+##### Sexo
+
+Las mujeres tienen en promedio \$152 menos de ingreso que los hombres, efecto altamente significativo (p \< 0.001).
+
+##### Estado civil
+
+-   Separado/divorciado: ganan \$120 menos que los casados en promedio. Efecto significativo.
+
+-   Soltero: ganan \$138 menos que los casados en promedio. Efecto significativo.
+
+-   Unido: ganan \$63 menos que los casados en promedio. Efecto significativo.
+
+-   Viudo: ganan \$184 menos que los casados en promedio. Efecto significativo.
 
 Todos los estados civiles distintos de casado presentan menor ingreso.
 
-Antigüedad laboral
-
-Categoría de referencia: Menos de 3 meses.
+##### Antigüedad laboral
 
 Ninguna categoría resulta estadísticamente significativa (todos los p-values \> 0.05, salvo "6 meses a 1 año" con p = 0.098 marginal). La antigüedad laboral no tiene efecto significativo sobre el ingreso en este modelo.
 
-Ajuste global
+#### Ajuste global
 
 El modelo explica el 32.7% de la variabilidad del ingreso (R²aj = 0.327), siendo globalmente significativo (F-statistic p \< 0.001).
