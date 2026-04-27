@@ -28,6 +28,7 @@ library(ISLR)
 library(glmnet)
 library(caret)
 library(dplyr)
+library(pROC)
 library(MASS)
 library(corrplot)
 library(purrr)
@@ -329,7 +330,7 @@ Durbin-Watson indica que existe autocorrelación positiva leve. El supuesto no s
 vif_values <- car::vif(mod_aic)
 
 # 2. Lo convertimos a una tabla limpia
-# Nota: Usamos GVIF^(1/(2*Df)) si hay variables categóricas, que equivale al VIF tradicional
+
 if(is.matrix(vif_values)) {
   vif_df <- as.data.frame(vif_values) %>% 
     mutate(Variable = rownames(.)) %>%
@@ -559,6 +560,157 @@ De acuerdo a los resultados obtenidos, el modelo más adecuado para este ejemplo
 
 **Modelo 1** MCO (Selección AIC) - MSE: 312404.5
 
-**Modelo 2** Regresión Ridge ($\lambda = 27.10$)  - MSE: 311886.8
+**Modelo 2** Regresión Ridge ($\lambda = 27.10$) - MSE: 311886.8
 
-**Modelo 3** Regresión Lasso ($\lambda = 0.21$)  - MSE: 312279.7
+**Modelo 3** Regresión Lasso ($\lambda = 0.21$) - MSE: 312279.7
+
+## Consigna III: Regresión Logística
+
+```{r}
+#| label: CONSIGN_3
+#| echo: false
+#| message: false
+#| warning: false
+
+set.seed(989269)
+# 1. Preparación de datos
+ephrl <- eph %>% 
+      mutate(y = ifelse(ingreso_ocup < 1000, 0, 1))
+
+formula_log <- y ~ formal + horas_trabajo + educ_cat + region + edad + sexo + est_civil + ant_laboral
+
+
+filas_train <- createDataPartition(ephrl$y, p = 0.7, list = FALSE)
+entrenar_log <- ephrl[filas_train, ]
+probar_log <- ephrl[-filas_train, ]
+
+mod_glm <- glm(
+  formula_log,
+  family = binomial(link = "logit"),
+  data = entrenar_log
+)
+
+#  significativos
+coeficientes_sig <- tidy(mod_glm) %>%
+  filter(p.value < 0.05)
+
+# Cálculo de ODDS
+exp(coef(mod_glm))[names(coef(mod_glm)) %in% coeficientes_sig$term] %>%
+  kable(
+        booktabs = TRUE,
+        digits = 3,
+        caption = "Razones de Odds (Exp) de Predictores Significativos",
+        col.names = "Valor")
+
+```
+
+### Razones de odds. 
+
+El objetivo de una **razón de odds** es comparar chances de éxito entre 2 grupos diferentes. En la lista anterior, el valor indica cuanto más o menos chances de ganar más de 1000, tiene el grupo, en comparación con la categoría de referencia (la que no aparece en la lista).
+
+Manteniendo el resto de las variables constantes:
+
+-   formalSi: las personas con trabajo formal tienen 5 veces más de chances de ganar más de 1000 en comparación con los informales.
+
+-   horas_trabajo: por cada hora adicional trabajada, las chances de ganar más de 1000 aumentan aumentan un 4.7% ($1.047 - 1 = 0.047$).
+
+-   educ_catPrimario: la educación primaria tienen 2 veces más chances de ganar 1000 que quienes no tiene educación.
+
+-   educ_catSecundario: la educación secundaria tienen 4 veces más chances de ganar 1000 que quienes no tiene educación.
+
+-   educ_catSuperior: la educación primaria tienen 10 veces más chances de ganar 1000 que quienes no tiene educación.
+
+-   regionGran Buenos Aires: vivir en Gran Buenos Aires multiplica por 1.613 las chances de éxito respecto a Cuyo.
+
+-   regionPampeana 1.434
+
+-   regionPatagonia: vivir en la Patagonia multiplica por 4.8 las chances de éxito respecto a Cuyo. En contraste, el Noroeste (0.458) las reduce a menos de la mitad.
+
+-   edad 1.018
+
+-   sexoMujer: en este caso tenemos un efecto negativo. Las mujeres tienen un 48.3% menos de chances ($1 - 0.517 = 0.483$) de superar el umbral de ingresos que los hombres.
+
+-   est_civilseparado o divorciado 0.644
+
+-   est_civilsoltero 0.548 est_civilviudo 0.534
+
+-   ant_laboralMas de 5 años 2.171
+
+### Curva ROC
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+predicciones_test <- predict(mod_glm, newdata = probar_log, type = "response")
+
+curvaROC <- roc(
+    response = probar_log$y,
+    predictor = predicciones_test,
+    quiet = TRUE
+)
+
+plot(curvaROC, print.auc = TRUE)
+```
+
+Un **AUC de 0.851** indica que tu clasificador tiene un desempeño **muy bueno**. Significa que si seleccionamos al azar a una persona que gana 1000 y a otra que gana menos de 1000, existe un **85.1% de probabilidad** de que el modelo asigne una probabilidad de "éxito" más alta a la persona que realmente gana más.
+
+```{r}
+#| label: proc
+#| echo: false
+#| message: false
+#| warning: false
+
+pROC::coords(curvaROC, "best", ret = "threshold")
+```
+
+El punto óptimo donde maximizamos sensibilidad y especificidad es 0.389.
+
+Usando este punto, sacamos la matriz de confusión:
+
+```{r}
+#| label: matrix
+#| echo: false
+#| message: false
+#| warning: false
+
+umbral <- 0.3895486
+predichos <- factor(ifelse(predicciones_test >= umbral, 1, 0), levels = c(0, 1))
+referencia <- factor(probar_log$y, levels = c(0, 1))
+confusionMatrix(data = predichos, reference = referencia, positive = "1")
+
+```
+
+```{r}
+#| eval: false
+#| message: false
+#| warning: false
+#| include: false
+
+umbral <- 0.5
+predichos <- factor(ifelse(predicciones_test >= umbral, 1, 0), levels = c(0, 1))
+referencia <- factor(probar_log$y, levels = c(0, 1))
+confusionMatrix(data = predichos, reference = referencia, positive = "1")
+```
+
+### Exactitud Global: 76.2%
+
+La precisión global indica que el modelo clasificó correctamente al **76.2%** de los individuos del conjunto de prueba.
+
+### Sensibilidad: 81.84%
+
+El 81.84% de los verdaderos positivos (VP) fueron clasificados como tales.
+
+Es la capacidad del modelo para detectar los "éxitos" (personas que ganan $\ge 1000$).
+
+### Especificidad: 72.76%
+
+De todas las personas que tienen ingresos bajos, el modelo identificó correctamente al **72.76%**.
+
+### Valor Predictivo Positivo (VPP): 64.64%
+
+Cuando el modelo predice un ingreso alto, acierta el **64.64%** de las veces.
+
+### Valor Predictivo Negativo (VPN): 86.82%
+
+Cuando el modelo predice que alguien tiene ingresos bajos, tiene un **86.82% de seguridad** de que es verdad.

@@ -131,6 +131,16 @@ window.Quarto = {
   <li><a href="#ajustar-el-modelo-mediante-lasso." id="toc-ajustar-el-modelo-mediante-lasso." class="nav-link" data-scroll-target="#ajustar-el-modelo-mediante-lasso.">Ajustar el modelo mediante Lasso.</a></li>
   <li><a href="#capacidad-predictiva." id="toc-capacidad-predictiva." class="nav-link" data-scroll-target="#capacidad-predictiva.">Capacidad predictiva.</a></li>
   </ul></li>
+  <li><a href="#consigna-iii-regresión-logística" id="toc-consigna-iii-regresión-logística" class="nav-link" data-scroll-target="#consigna-iii-regresión-logística">Consigna III: Regresión Logística</a>
+  <ul class="collapse">
+  <li><a href="#razones-de-odds." id="toc-razones-de-odds." class="nav-link" data-scroll-target="#razones-de-odds.">Razones de odds.</a></li>
+  <li><a href="#curva-roc" id="toc-curva-roc" class="nav-link" data-scroll-target="#curva-roc">Curva ROC</a></li>
+  <li><a href="#exactitud-global-76.2" id="toc-exactitud-global-76.2" class="nav-link" data-scroll-target="#exactitud-global-76.2">Exactitud Global: 76.2%</a></li>
+  <li><a href="#sensibilidad-81.84" id="toc-sensibilidad-81.84" class="nav-link" data-scroll-target="#sensibilidad-81.84">Sensibilidad: 81.84%</a></li>
+  <li><a href="#especificidad-72.76" id="toc-especificidad-72.76" class="nav-link" data-scroll-target="#especificidad-72.76">Especificidad: 72.76%</a></li>
+  <li><a href="#valor-predictivo-positivo-vpp-64.64" id="toc-valor-predictivo-positivo-vpp-64.64" class="nav-link" data-scroll-target="#valor-predictivo-positivo-vpp-64.64">Valor Predictivo Positivo (VPP): 64.64%</a></li>
+  <li><a href="#valor-predictivo-negativo-vpn-86.82" id="toc-valor-predictivo-negativo-vpn-86.82" class="nav-link" data-scroll-target="#valor-predictivo-negativo-vpn-86.82">Valor Predictivo Negativo (VPN): 86.82%</a></li>
+  </ul></li>
   </ul>
 <div class="quarto-other-links"><h2>Otros Enlaces</h2><ul><li><a href="./doc/index.pdf"><i class="bi bi-link-45deg"></i>Descargar Informe PDF</a></li></ul></div></nav>
 </div>
@@ -162,7 +172,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Fecha de publicación</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">26 de abril de 2026</p>
+      <p class="date">27 de abril de 2026</p>
     </div>
   </div>
   
@@ -973,6 +983,195 @@ alternative hypothesis: true autocorrelation is greater than 0</code></pre>
 <p><strong>Modelo 1</strong> MCO (Selección AIC) - MSE: 312404.5</p>
 <p><strong>Modelo 2</strong> Regresión Ridge (<span class="math inline">\(\lambda = 27.10\)</span>) - MSE: 311886.8</p>
 <p><strong>Modelo 3</strong> Regresión Lasso (<span class="math inline">\(\lambda = 0.21\)</span>) - MSE: 312279.7</p>
+</section>
+</section>
+<section id="consigna-iii-regresión-logística" class="level2">
+<h2 class="anchored" data-anchor-id="consigna-iii-regresión-logística">Consigna III: Regresión Logística</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Razones de Odds (Exp) de Predictores Significativos</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.003</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">formalSi</td>
+<td style="text-align: right;">5.316</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">horas_trabajo</td>
+<td style="text-align: right;">1.047</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">educ_catPrimario</td>
+<td style="text-align: right;">2.033</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">educ_catSecundario</td>
+<td style="text-align: right;">4.212</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">educ_catSuperior</td>
+<td style="text-align: right;">10.646</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">regionGran Buenos Aires</td>
+<td style="text-align: right;">1.613</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">regionNoreste</td>
+<td style="text-align: right;">0.524</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">regionNoroeste</td>
+<td style="text-align: right;">0.458</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">regionPampeana</td>
+<td style="text-align: right;">1.434</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">regionPatagonia</td>
+<td style="text-align: right;">4.831</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">edad</td>
+<td style="text-align: right;">1.018</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sexoMujer</td>
+<td style="text-align: right;">0.517</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">est_civilseparado o divorciado</td>
+<td style="text-align: right;">0.644</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">est_civilsoltero</td>
+<td style="text-align: right;">0.548</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">est_civilviudo</td>
+<td style="text-align: right;">0.534</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ant_laboralMas de 5 años</td>
+<td style="text-align: right;">2.171</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="razones-de-odds." class="level3">
+<h3 class="anchored" data-anchor-id="razones-de-odds.">Razones de odds.</h3>
+<p>El objetivo de una <strong>razón de odds</strong> es comparar chances de éxito entre 2 grupos diferentes. En la lista anterior, el valor indica cuanto más o menos chances de ganar más de 1000, tiene el grupo, en comparación con la categoría de referencia (la que no aparece en la lista).</p>
+<p>Manteniendo el resto de las variables constantes:</p>
+<ul>
+<li><p>formalSi: las personas con trabajo formal tienen 5 veces más de chances de ganar más de 1000 en comparación con los informales.</p></li>
+<li><p>horas_trabajo: por cada hora adicional trabajada, las chances de ganar más de 1000 aumentan aumentan un 4.7% (<span class="math inline">\(1.047 - 1 = 0.047\)</span>).</p></li>
+<li><p>educ_catPrimario: la educación primaria tienen 2 veces más chances de ganar 1000 que quienes no tiene educación.</p></li>
+<li><p>educ_catSecundario: la educación secundaria tienen 4 veces más chances de ganar 1000 que quienes no tiene educación.</p></li>
+<li><p>educ_catSuperior: la educación primaria tienen 10 veces más chances de ganar 1000 que quienes no tiene educación.</p></li>
+<li><p>regionGran Buenos Aires: vivir en Gran Buenos Aires multiplica por 1.613 las chances de éxito respecto a Cuyo.</p></li>
+<li><p>regionPampeana 1.434</p></li>
+<li><p>regionPatagonia: vivir en la Patagonia multiplica por 4.8 las chances de éxito respecto a Cuyo. En contraste, el Noroeste (0.458) las reduce a menos de la mitad.</p></li>
+<li><p>edad 1.018</p></li>
+<li><p>sexoMujer: en este caso tenemos un efecto negativo. Las mujeres tienen un 48.3% menos de chances (<span class="math inline">\(1 - 0.517 = 0.483\)</span>) de superar el umbral de ingresos que los hombres.</p></li>
+<li><p>est_civilseparado o divorciado 0.644</p></li>
+<li><p>est_civilsoltero 0.548 est_civilviudo 0.534</p></li>
+<li><p>ant_laboralMas de 5 años 2.171</p></li>
+</ul>
+</section>
+<section id="curva-roc" class="level3">
+<h3 class="anchored" data-anchor-id="curva-roc">Curva ROC</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>predicciones_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(mod_glm, <span class="at">newdata =</span> probar_log, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>curvaROC <span class="ot">&lt;-</span> <span class="fu">roc</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">response =</span> probar_log<span class="sc">$</span>y,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">predictor =</span> predicciones_test,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(curvaROC, <span class="at">print.auc =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Un <strong>AUC de 0.851</strong> indica que tu clasificador tiene un desempeño <strong>muy bueno</strong>. Significa que si seleccionamos al azar a una persona que gana 1000 y a otra que gana menos de 1000, existe un <strong>85.1% de probabilidad</strong> de que el modelo asigne una probabilidad de “éxito” más alta a la persona que realmente gana más.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pROC<span class="sc">::</span><span class="fu">coords</span>(curvaROC, <span class="st">"best"</span>, <span class="at">ret =</span> <span class="st">"threshold"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  threshold
+1 0.3895486</code></pre>
+</div>
+</div>
+<p>El punto óptimo donde maximizamos sensibilidad y especificidad es 0.389.</p>
+<p>Usando este punto, sacamos la matriz de confusión:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1245  189
+         1  466  852
+                                          
+               Accuracy : 0.762           
+                 95% CI : (0.7456, 0.7778)
+    No Information Rate : 0.6217          
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+                                          
+                  Kappa : 0.519           
+                                          
+ Mcnemar's Test P-Value : &lt; 2.2e-16       
+                                          
+            Sensitivity : 0.8184          
+            Specificity : 0.7276          
+         Pos Pred Value : 0.6464          
+         Neg Pred Value : 0.8682          
+             Prevalence : 0.3783          
+         Detection Rate : 0.3096          
+   Detection Prevalence : 0.4789          
+      Balanced Accuracy : 0.7730          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+</section>
+<section id="exactitud-global-76.2" class="level3">
+<h3 class="anchored" data-anchor-id="exactitud-global-76.2">Exactitud Global: 76.2%</h3>
+<p>La precisión global indica que el modelo clasificó correctamente al <strong>76.2%</strong> de los individuos del conjunto de prueba.</p>
+</section>
+<section id="sensibilidad-81.84" class="level3">
+<h3 class="anchored" data-anchor-id="sensibilidad-81.84">Sensibilidad: 81.84%</h3>
+<p>El 81.84% de los verdaderos positivos (VP) fueron clasificados como tales.</p>
+<p>Es la capacidad del modelo para detectar los “éxitos” (personas que ganan <span class="math inline">\(\ge 1000\)</span>).</p>
+</section>
+<section id="especificidad-72.76" class="level3">
+<h3 class="anchored" data-anchor-id="especificidad-72.76">Especificidad: 72.76%</h3>
+<p>De todas las personas que tienen ingresos bajos, el modelo identificó correctamente al <strong>72.76%</strong>.</p>
+</section>
+<section id="valor-predictivo-positivo-vpp-64.64" class="level3">
+<h3 class="anchored" data-anchor-id="valor-predictivo-positivo-vpp-64.64">Valor Predictivo Positivo (VPP): 64.64%</h3>
+<p>Cuando el modelo predice un ingreso alto, acierta el <strong>64.64%</strong> de las veces.</p>
+</section>
+<section id="valor-predictivo-negativo-vpn-86.82" class="level3">
+<h3 class="anchored" data-anchor-id="valor-predictivo-negativo-vpn-86.82">Valor Predictivo Negativo (VPN): 86.82%</h3>
+<p>Cuando el modelo predice que alguien tiene ingresos bajos, tiene un <strong>86.82% de seguridad</strong> de que es verdad.</p>
 </section>
 </section>
 

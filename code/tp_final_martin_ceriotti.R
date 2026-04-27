@@ -202,3 +202,5 @@ influencePlot(mod_aic)  # Tabla con casos influyentes (library(car))
 # 
 # Ajuste global
 # El modelo explica el 32.7% de la variabilidad del ingreso (R²aj = 0.327), siendo globalmente significativo (F-statistic p < 0.001).
+
+unique(eph$region)

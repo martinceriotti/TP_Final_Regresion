@@ -4,7 +4,7 @@ Universidad Austral. Master en ciencia de datos. Cohorte 2025.
 
 Las carpetas se distribuyen de la siguiente manera:
 
-Consignas en /doc.
+Consignas y TP en PDF en /doc.
 
 Scripts en /code.
 
