@@ -4,7 +4,7 @@ author:
   - name: "Martín Ceriotti"
     affiliations:
       - name: "Universidad Austral."
-        department: "Sede Rosario." # Opcional
+        department: "Sede Rosario."  
 date: last-modified
 lang: es
 format:
@@ -260,7 +260,7 @@ El modelo mod_aic destaca en 3 de los 4 indicadores. Podemos concluir que es el 
 #| echo: false
 #| message: false
 #| warning: false
-# --- A. Linealidad y Homocedasticidad ---
+# --- Linealidad y Homocedasticidad ---
 test_bp <- bptest(mod_aic)
 plot(mod_aic, 1)
 etiqueta <- paste0("Breusch-Pagan Test: BP = ", round(test_bp$statistic, 2), 
@@ -281,7 +281,7 @@ El modelo presenta **heterocedasticidad**, lo que significa que el error de nues
 #| message: false
 #| warning: false
 
-# --- B. Normalidad ---
+# Normalidad ---
 
 test_ad <- ad.test(residuals(mod_aic))
 plot(mod_aic, 2)
@@ -326,10 +326,10 @@ Durbin-Watson indica que existe autocorrelación positiva leve. El supuesto no s
 #| message: false
 #| warning: false
 
-# 1. Calculamos VIF
+# Calculamos VIF
 vif_values <- car::vif(mod_aic)
 
-# 2. Lo convertimos a una tabla limpia
+# Lo convertimos a una tabla
 
 if(is.matrix(vif_values)) {
   vif_df <- as.data.frame(vif_values) %>% 
@@ -339,7 +339,7 @@ if(is.matrix(vif_values)) {
   vif_df <- data.frame(Variable = names(vif_values), VIF = vif_values)
 }
 
-# 3. Formateo de tabla idéntico a tus otras tablas
+#Formateo de tabla
 vif_df %>%
   dplyr::select(Variable, VIF) %>%
   mutate(VIF = round(VIF, 3)) %>%
@@ -387,8 +387,9 @@ La Distancia de Cook mide cuánto cambian los coeficientes del modelo cuando se 
 #| echo: false
 #| message: false
 #| warning: false
+# Leverage vs Residuos estandarizados
+plot(mod_aic, 5)        
 
-plot(mod_aic, 5)        # Leverage vs Residuos estandarizados (incluye Cook)
 ```
 
 ### Interpretación de efectos sobre el ingreso ocupacional.
@@ -604,37 +605,33 @@ exp(coef(mod_glm))[names(coef(mod_glm)) %in% coeficientes_sig$term] %>%
 
 ```
 
-### Razones de odds. 
+### Razones de odds.
 
-El objetivo de una **razón de odds** es comparar chances de éxito entre 2 grupos diferentes. En la lista anterior, el valor indica cuanto más o menos chances de ganar más de 1000, tiene el grupo, en comparación con la categoría de referencia (la que no aparece en la lista).
+El objetivo de una **razón de odds** es comparar chances de éxito entre 2 grupos diferentes. En la lista anterior, el valor indica cuanto más o menos chances de ganar 1000 o más, tiene el grupo, en comparación con la categoría de referencia (la que no aparece en la lista).
 
 Manteniendo el resto de las variables constantes:
 
--   formalSi: las personas con trabajo formal tienen 5 veces más de chances de ganar más de 1000 en comparación con los informales.
+-   formalSi: las personas con trabajo formal tienen 5 veces más de chances de ganar a partir de 1000 en comparación con los informales.
 
--   horas_trabajo: por cada hora adicional trabajada, las chances de ganar más de 1000 aumentan aumentan un 4.7% ($1.047 - 1 = 0.047$).
+-   horas_trabajo: por cada hora adicional trabajada, las chances de ganar 1000 o más aumentan un 4.7%.
 
--   educ_catPrimario: la educación primaria tienen 2 veces más chances de ganar 1000 que quienes no tiene educación.
+-   educ_catPrimario: la persona con educación primaria tienen 2 veces más chances de ganar 1000 o más que quienes no tiene educación.
 
--   educ_catSecundario: la educación secundaria tienen 4 veces más chances de ganar 1000 que quienes no tiene educación.
+-   educ_catSecundario: la persona con educación secundaria tienen 4 veces más chances de ganar 1000 o más que quienes no tiene educación.
 
--   educ_catSuperior: la educación primaria tienen 10 veces más chances de ganar 1000 que quienes no tiene educación.
+-   educ_catSuperior: la persona con educación superior tienen 10 veces más chances de ganar 1000 o más que quienes no tiene educación.
 
--   regionGran Buenos Aires: vivir en Gran Buenos Aires multiplica por 1.613 las chances de éxito respecto a Cuyo.
-
--   regionPampeana 1.434
+-   regionGran Buenos Aires: vivir en Gran Buenos Aires multiplica por 1.613 las chances de ganar 1000 o más de 1000 respecto a Cuyo.
 
 -   regionPatagonia: vivir en la Patagonia multiplica por 4.8 las chances de éxito respecto a Cuyo. En contraste, el Noroeste (0.458) las reduce a menos de la mitad.
 
--   edad 1.018
+-   edad 1.018: por cada año adicional del trabajador, las chances de ganar 1000 o más aumentan un 1.8%.
 
 -   sexoMujer: en este caso tenemos un efecto negativo. Las mujeres tienen un 48.3% menos de chances ($1 - 0.517 = 0.483$) de superar el umbral de ingresos que los hombres.
 
--   est_civilseparado o divorciado 0.644
+-   est_civilseparado o divorciado: los divorciados o separados tienen 35.6% menos de chances de superar o igualar los 1000 que el grupo de referencia.
 
--   est_civilsoltero 0.548 est_civilviudo 0.534
-
--   ant_laboralMas de 5 años 2.171
+-   ant_laboralMas de 5 años: tener más de 5 años de antiguedad laboral multiplica por 2.1 las chances de igualar o superar los 1000 de ingreso ocupacional.
 
 ### Curva ROC
 
@@ -642,18 +639,19 @@ Manteniendo el resto de las variables constantes:
 #| echo: false
 #| message: false
 #| warning: false
+predicciones <- predict(mod_glm, newdata = entrenar_log, type = "response")
 predicciones_test <- predict(mod_glm, newdata = probar_log, type = "response")
 
 curvaROC <- roc(
-    response = probar_log$y,
-    predictor = predicciones_test,
+    response = entrenar_log$y,
+    predictor = predicciones,
     quiet = TRUE
 )
 
 plot(curvaROC, print.auc = TRUE)
 ```
 
-Un **AUC de 0.851** indica que tu clasificador tiene un desempeño **muy bueno**. Significa que si seleccionamos al azar a una persona que gana 1000 y a otra que gana menos de 1000, existe un **85.1% de probabilidad** de que el modelo asigne una probabilidad de "éxito" más alta a la persona que realmente gana más.
+Un **AUC de 0.847** indica que tu clasificador tiene un desempeño **muy bueno**. Significa que si seleccionamos al azar a una persona que gana 1000 y a otra que gana menos de 1000, existe un **87.7% de probabilidad** de que el modelo asigne una probabilidad de "éxito" más alta a la persona que realmente gana más.
 
 ```{r}
 #| label: proc
@@ -664,7 +662,7 @@ Un **AUC de 0.851** indica que tu clasificador tiene un desempeño **muy bueno**
 pROC::coords(curvaROC, "best", ret = "threshold")
 ```
 
-El punto óptimo donde maximizamos sensibilidad y especificidad es 0.389.
+El punto óptimo donde maximizamos sensibilidad y especificidad es 0.359624.
 
 Usando este punto, sacamos la matriz de confusión:
 
@@ -674,7 +672,9 @@ Usando este punto, sacamos la matriz de confusión:
 #| message: false
 #| warning: false
 
-umbral <- 0.3895486
+# El punto de corte óptimo lo calculás en función de los datos de entrenamiento. Luego, aplicás el valor hallado para clasificar a los datos de prueba y construir la matriz de confusión.
+
+umbral <- 0.359624
 predichos <- factor(ifelse(predicciones_test >= umbral, 1, 0), levels = c(0, 1))
 referencia <- factor(probar_log$y, levels = c(0, 1))
 confusionMatrix(data = predichos, reference = referencia, positive = "1")
@@ -693,24 +693,24 @@ referencia <- factor(probar_log$y, levels = c(0, 1))
 confusionMatrix(data = predichos, reference = referencia, positive = "1")
 ```
 
-### Exactitud Global: 76.2%
+### Exactitud Global: 74.71%
 
-La precisión global indica que el modelo clasificó correctamente al **76.2%** de los individuos del conjunto de prueba.
+La precisión global indica que el modelo clasificó correctamente al **74.71%** de los individuos del conjunto de prueba.
 
-### Sensibilidad: 81.84%
+### Sensibilidad: 83.77%
 
-El 81.84% de los verdaderos positivos (VP) fueron clasificados como tales.
+El 83.77% de los verdaderos positivos (VP) fueron clasificados como tales.
 
-Es la capacidad del modelo para detectar los "éxitos" (personas que ganan $\ge 1000$).
+Es la capacidad del modelo para detectar los "éxitos" (personas que ganan más de 1000).
 
-### Especificidad: 72.76%
+### Especificidad: 69.20%
 
-De todas las personas que tienen ingresos bajos, el modelo identificó correctamente al **72.76%**.
+De todas las personas que tienen ingresos bajos, el modelo identificó correctamente al **69.20%**.
 
-### Valor Predictivo Positivo (VPP): 64.64%
+### Valor Predictivo Positivo (VPP): 62.33%
 
-Cuando el modelo predice un ingreso alto, acierta el **64.64%** de las veces.
+Cuando el modelo predice un ingreso alto, acierta el **62.33%** de las veces.
 
-### Valor Predictivo Negativo (VPN): 86.82%
+### Valor Predictivo Negativo (VPN): 87.51%
 
-Cuando el modelo predice que alguien tiene ingresos bajos, tiene un **86.82% de seguridad** de que es verdad.
+Cuando el modelo predice que alguien tiene ingresos bajos, tiene un **87.51% de seguridad** de que es verdad.
