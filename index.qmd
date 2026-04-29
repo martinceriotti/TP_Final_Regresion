@@ -406,15 +406,17 @@ Por cada hora adicional trabajada, el ingreso aumenta \$10.69. Es significativo 
 
 ##### Nivel educativo:
 
--   Primario: tener el nivel primera aumenta \$103. No es significativo (p = 0.074).
+-   Primario: tener el nivel primera aumenta \$103 respecto de no tener educación. No es significativo (p = 0.074).
 
--   Secundario: tener el nivel secundario aumenta \$238. Es Significativo (p \< 0.001).
+-   Secundario: tener el nivel secundario aumenta \$238 respecto de no tener educación. Es Significativo (p \< 0.001).
 
--   Superior: el nivel superior de educación aumenta \$607. Altamente significativo (p \< 0.001).
+-   Superior: el nivel superior de educación aumenta \$607 respecto de no tener educación. Altamente significativo (p \< 0.001).
 
 A mayor educación, mayor ingreso.
 
 ##### Región:
+
+Se comparan contra el grupo de referencia "Cuyo."
 
 -   Gran Buenos Aires: pertenecer a esta región aumenta \$139. Es estadísticamente significativo (p \< 0.001).
 
@@ -500,7 +502,7 @@ lambda_ridge
 
 El valor óptimo hallado mediante validación cruzada ($k=5$) es $\lambda \approx 27.10$. Al ser un valor mayor a cero, el algoritmo confirma que aplicar una ligera penalización a los coeficientes ayuda a generalizar mejor el modelo. Esto indica que el modelo original de Mínimos Cuadrados Ordinarios (MCO) tenía una varianza ligeramente elevada que Ridge logra mitigar.
 
-Comparación de Desempeño (MSE). Al evaluar ambos modelos con los datos de prueba (test set), observamos que:
+Comparación de Desempeño (MSE): al evaluar ambos modelos con los datos de prueba (test set), observamos que:
 
 -   MSE Ridge: $311886.8$
 
@@ -549,7 +551,7 @@ cv_lasso$lambda.1se
 
 El valor óptimo hallado mediante validación cruzada ($k=5$) es $\lambda \approx 0.2098$.
 
-Comparación de Desempeño (MSE). Al evaluar ambos modelos con los datos de prueba (test set), observamos que:
+Comparación de Desempeño (MSE): al evaluar ambos modelos con los datos de prueba (test set), observamos que:
 
 -   MSE Lasso: $312279.7$
 
@@ -607,7 +609,7 @@ exp(coef(mod_glm))[names(coef(mod_glm)) %in% coeficientes_sig$term] %>%
 
 ### Razones de odds.
 
-El objetivo de una **razón de odds** es comparar chances de éxito entre 2 grupos diferentes. En la lista anterior, el valor indica cuanto más o menos chances de ganar 1000 o más, tiene el grupo, en comparación con la categoría de referencia (la que no aparece en la lista).
+El objetivo de la **razón de odds** es comparar chances de éxito entre 2 grupos diferentes. En la lista anterior, el valor indica cuanto más o menos chances de ganar 1000 o más, tiene el grupo, en comparación con la categoría de referencia (la que no aparece en la lista).
 
 Manteniendo el resto de las variables constantes:
 
